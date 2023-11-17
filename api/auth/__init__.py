@@ -7,7 +7,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token
 auth_blp = Blueprint('auth', __name__)
 
 
-@auth_blp.route('/login')
+@auth_blp.route('/login', methods=['POST'])
 def login():
     try:
         data = request.json
@@ -41,7 +41,7 @@ def login():
         return jsonify({"message": "An error occurred"}), 400
 
 
-@auth_blp.route('/register')
+@auth_blp.route('/register', methods=['POST'])
 def register():
     try:
         data = request.json
