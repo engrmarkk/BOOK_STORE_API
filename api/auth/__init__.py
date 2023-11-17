@@ -75,6 +75,8 @@ def register():
         )
         user.save()
 
+        return jsonify({"message": "Registration successful"}), 201
+
     except KeyError:
         return jsonify({"message": "All fields are required"}), 400
     except Exception as e:
