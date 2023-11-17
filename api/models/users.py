@@ -7,6 +7,8 @@ def hexid():
 class Users(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.String(100), primary_key=True, default=hexid)
+    firstname = db.Column(db.String(100), nullable=False)
+    lastname = db.Column(db.String(100), nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
