@@ -2,6 +2,7 @@ from flask import Flask
 from api.extensions import db, migrate
 from api.auth import auth_blp
 from api.config import config_dict
+from api.models import *
 
 
 def create_app(configure=config_dict["development"]):
