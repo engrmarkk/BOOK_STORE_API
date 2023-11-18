@@ -1,2 +1,2 @@
 from .users import Users
-from .books import Books
+from .books import Books, BookGenre
