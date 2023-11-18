@@ -7,6 +7,7 @@ books_blp = Blueprint('books', __name__)
 
 
 @books_blp.route('/books', methods=['POST'])
+@jwt_required()
 @admin_required
 def books():
     try:
@@ -40,6 +41,7 @@ def books():
 
 
 @books_blp.route('/books', methods=['GET'])
+@jwt_required()
 def get_books():
     try:
         books = Books.query.all()
@@ -51,7 +53,7 @@ def get_books():
                 "author": book.author,
                 "description": book.description,
                 "image": book.image,
-                "category": book.category
+                "genre": book.genre
             })
         return jsonify({"message": "success", "books": books_list}), 200
     except Exception as e:
