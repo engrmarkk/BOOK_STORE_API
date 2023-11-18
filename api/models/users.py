@@ -1,8 +1,10 @@
 from api.extensions import db
 import secrets
 
+
 def hexid():
     return secrets.token_hex(8)
+
 
 class Users(db.Model):
     __tablename__ = 'users'
