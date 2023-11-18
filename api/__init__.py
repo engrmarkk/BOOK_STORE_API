@@ -1,6 +1,7 @@
 from flask import Flask
 from api.extensions import db, migrate, jwt_manager
 from api.auth import auth_blp
+from api.endpoints import books_blp
 from api.config import config_dict
 from api.models import *
 
@@ -14,4 +15,5 @@ def create_app(configure=config_dict["development"]):
     jwt_manager.init_app(app)
 
     app.register_blueprint(auth_blp)
+    app.register_blueprint(books_blp)
     return app
