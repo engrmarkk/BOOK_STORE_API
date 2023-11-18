@@ -3,69 +3,35 @@ from api.models import Books, BookGenre
 from api.decorator import admin_required
 from flask_jwt_extended import jwt_required
 
-
 books_blp = Blueprint('books', __name__)
 
 
-@books_blp.route('/books', methods=['POST', 'PATCH', 'DELETE'])
+@books_blp.route('/books', methods=['POST'])
 @admin_required
 def books():
     try:
-        if request.method == 'POST':
-            data = request.json
+        data = request.json
 
-            title = data.get('title')
-            author = data.get('author')
-            description = data.get('description')
-            genre = data.get('genre')
+        title = data.get('title')
+        author = data.get('author')
+        description = data.get('description')
+        genre = data.get('genre')
+        quantity = data.get('quantity')
 
-            genre_ = BookGenre.query.filter_by(genre=genre).first()
-            if not genre_:
-                return jsonify({"message": "Genre does not exist"}), 400
+        # check the instance of the quantity
+        if not isinstance(quantity, int):
+            return jsonify({"message": "Quantity must be an integer"}), 400
 
-            if not title or not author or not description or not genre:
-                return jsonify({"message": "All fields are required"}), 400
-            if (
-                    not "title" in data or not "author" in data or not "description" in data or not "image" in data or not "category" in data):
-                return jsonify({"message": "All fields are required"}), 400
-            book = Books(title=title, author=author, description=description, genre=genre)
-            book.save()
-            return jsonify({"message": "Book added successfully"}), 201
-        if request.method == 'PATCH':
-            data = request.json
-            title = data.get('title')
-            author = data.get('author')
-            description = data.get('description')
-            image = data.get('image')
-            category = data.get('category')
-            book_id = data.get('book_id')
-            if not title or not author or not description or not image or not category or not book_id:
-                return jsonify({"message": "All fields are required"}), 400
-            if (
-                    not "title" in data or not "author" in data or not "description" in data or not "image" in data or not "category" in data or not "book_id" in data):
-                return jsonify({"message": "All fields are required"}), 400
-            book = Books.query.filter_by(id=book_id).first()
-            if not book:
-                return jsonify({"message": "Book does not exist"}), 400
-            book.title = title
-            book.author = author
-            book.description = description
-            book.image = image
-            book.category = category
-            book.save()
-            return jsonify({"message": "Book updated successfully"}), 201
-        if request.method == 'DELETE':
-            data = request.json
-            book_id = data.get('book_id')
-            if not book_id:
-                return jsonify({"message": "All fields are required"}), 400
-            if not "book_id" in data:
-                return jsonify({"message": "All fields are required"}), 400
-            book = Books.query.filter_by(id=book_id).first()
-            if not book:
-                return jsonify({"message": "Book does not exist"}), 400
-            book.delete()
-            return jsonify({"message": "Book deleted successfully"}), 200
+        genre_ = BookGenre.query.filter_by(genre=genre).first()
+        if not genre_:
+            return jsonify({"message": "Genre does not exist"}), 400
+
+        if not title or not author or not description or not genre:
+            return jsonify({"message": "All fields are required"}), 400
+
+        book = Books(title=title, author=author, description=description, genre=genre, quantity=quantity)
+        book.save()
+        return jsonify({"message": "Book added successfully"}), 201
     except KeyError:
         return jsonify({"message": "All fields are required"}), 400
     except Exception as e:
@@ -92,6 +58,53 @@ def get_books():
         print(e, "error")
         return jsonify({"message": "An error occurred"}), 400
 
+
+# operation on a single book
+@books_blp.route('/books/<book_id>', methods=['GET', 'PATCH', 'DELETE'])
+@admin_required
+def get_single_book(book_id):
+    try:
+        book = Books.query.filter_by(id=book_id).first()
+        if not book:
+            return jsonify({"message": "Book does not exist"}), 400
+        if request.method == 'GET':
+            return jsonify({
+                "message": "success",
+                "book": {
+                    "id": book.id,
+                    "title": book.title,
+                    "author": book.author,
+                    "description": book.description,
+                    "image": book.image,
+                    "genre": book.genre
+                }
+            }), 200
+        elif request.method == 'PATCH':
+            data = request.json
+
+            title = data.get('title')
+            author = data.get('author')
+            description = data.get('description')
+            genre = data.get('genre')
+            quantity = data.get('quantity')
+
+            genre_ = BookGenre.query.filter_by(genre=genre).first()
+            if not genre_:
+                return jsonify({"message": "Genre does not exist"}), 400
+
+            book.title = title if title else book.title
+            book.author = author if author else book.author
+            book.description = description if description else book.description
+            book.genre = genre if genre else book.genre
+            book.quantity = quantity if quantity else book.quantity
+            book.update()
+            return jsonify({"message": "Book updated successfully"}), 200
+        elif request.method == 'DELETE':
+            book.delete()
+            return jsonify({"message": "Book deleted successfully"}), 200
+    except Exception as e:
+        print(e, "error")
+        return jsonify({"message": "An error occurred"}), 400
 
 
 list_of_genre = [
