@@ -10,7 +10,7 @@ def create_app(configure=config_dict["development"]):
     app.config.from_object(configure)
 
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, render_as_batch=True)
     jwt_manager.init_app(app)
 
     app.register_blueprint(auth_blp)
