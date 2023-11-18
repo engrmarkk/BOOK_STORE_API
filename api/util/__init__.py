@@ -13,3 +13,10 @@ def check_if_username_exists(username):
     if user:
         return True
     return False
+
+
+def check_if_admin(username):
+    user = Users.query.filter_by(username=username).first()
+    if user.is_admin:
+        return True
+    return False
