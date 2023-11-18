@@ -53,7 +53,9 @@ def get_books():
                 "author": book.author,
                 "description": book.description,
                 "image": book.image,
-                "genre": book.genre
+                "genre": book.genre,
+                "quantity": book.quantity,
+                "created_at": book.created_at
             })
         return jsonify({"message": "success", "books": books_list}), 200
     except Exception as e:
