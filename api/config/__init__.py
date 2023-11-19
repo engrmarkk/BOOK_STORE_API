@@ -6,6 +6,11 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///site.db'
     # set the secret key
     SECRET_KEY = 'secret'
+    # set JWT expiry time
+    JWT_ACCESS_TOKEN_EXPIRES = False
+    # set JWT blacklist
+    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
 
 
 class TestConfig(Config):
