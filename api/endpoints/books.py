@@ -30,6 +30,11 @@ def books():
         if not title or not author or not description or not genre:
             return jsonify({"message": "All fields are required"}), 400
 
+        # filter by title and author
+        book_ = Books.query.filter_by(title=title, author=author).first()
+        if book_:
+            return jsonify({"message": "Book already exists"}), 400
+
         book = Books(title=title, author=author, description=description, genre=genre, quantity=quantity)
         book.save()
         return jsonify({"message": "Book added successfully"}), 201
@@ -64,26 +69,15 @@ def get_books():
 
 
 # operation on a single book
-@books_blp.route('/books/<book_id>', methods=['GET', 'PATCH', 'DELETE'])
+@books_blp.route('/books/<book_id>', methods=['PATCH', 'DELETE'])
+@jwt_required()
 @admin_required
 def get_single_book(book_id):
     try:
         book = Books.query.filter_by(id=book_id).first()
         if not book:
             return jsonify({"message": "Book does not exist"}), 400
-        if request.method == 'GET':
-            return jsonify({
-                "message": "success",
-                "book": {
-                    "id": book.id,
-                    "title": book.title,
-                    "author": book.author,
-                    "description": book.description,
-                    "image": book.image,
-                    "genre": book.genre
-                }
-            }), 200
-        elif request.method == 'PATCH':
+        if request.method == 'PATCH':
             data = request.json
 
             title = data.get('title')
@@ -93,7 +87,7 @@ def get_single_book(book_id):
             quantity = data.get('quantity')
 
             genre_ = BookGenre.query.filter_by(genre=genre).first()
-            if not genre_:
+            if genre and not genre_:
                 return jsonify({"message": "Genre does not exist"}), 400
 
             book.title = title if title else book.title
@@ -106,6 +100,28 @@ def get_single_book(book_id):
         elif request.method == 'DELETE':
             book.delete()
             return jsonify({"message": "Book deleted successfully"}), 200
+    except Exception as e:
+        print(e, "error")
+        return jsonify({"message": "An error occurred"}), 400
+
+
+@books_blp.route('/books/<book_id>', methods=['GET'])
+@jwt_required()
+def get_a_single_book_(book_id):
+    try:
+        book = Books.query.filter_by(id=book_id).first()
+        if not book:
+            return jsonify({"message": "Book does not exist"}), 400
+        return jsonify({
+            "id": book.id,
+            "title": book.title,
+            "author": book.author,
+            "description": book.description,
+            "image": book.image,
+            "genre": book.genre,
+            "quantity": book.quantity,
+            "created_at": book.created_at
+        }), 200
     except Exception as e:
         print(e, "error")
         return jsonify({"message": "An error occurred"}), 400
