@@ -17,6 +17,7 @@ class Books(db.Model):
     genre = db.Column(db.String(100), db.ForeignKey('book_genre.id'), nullable=True,
                       default='General')
     quantity = db.Column(db.Integer, nullable=False)
+    amount = db.Column(db.Integer, default=0, nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
 
     def save(self):
